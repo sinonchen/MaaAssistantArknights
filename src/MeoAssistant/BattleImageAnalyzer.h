@@ -23,7 +23,7 @@ namespace asst
         };
     public:
         using AbstractImageAnalyzer::AbstractImageAnalyzer;
-        virtual ~BattleImageAnalyzer() = default;
+        virtual ~BattleImageAnalyzer() override = default;
 
         bool set_target(int target);
         void set_pre_total_kills(int pre_total_kills);
@@ -39,6 +39,7 @@ namespace asst
         int get_cost() const noexcept;
 
         void clear() noexcept;
+        void sort_opers_by_cost();  // 高费在前，费用降序
 
     protected:
         bool opers_analyze();   // 识别干员

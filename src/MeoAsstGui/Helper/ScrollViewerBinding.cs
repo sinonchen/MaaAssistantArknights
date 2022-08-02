@@ -1,3 +1,4 @@
+// <copyright file="ScrollViewerBinding.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,6 +9,7 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
 using System.Collections.Generic;
 using System.Windows;
@@ -16,12 +18,15 @@ using System.Windows.Shapes;
 
 namespace MeoAsstGui
 {
+    /// <summary>
+    /// The scroll viewer properties.
+    /// </summary>
     public static class ScrollViewerBinding
     {
         #region VerticalOffset attached property
 
         /// <summary>
-        /// VerticalOffset attached property
+        /// VerticalOffset attached property.
         /// </summary>
         public static readonly DependencyProperty VerticalOffsetProperty =
             DependencyProperty.RegisterAttached("VerticalOffset", typeof(double),
@@ -35,18 +40,32 @@ namespace MeoAsstGui
         private static readonly DependencyProperty VerticalOffsetBindingProperty =
             DependencyProperty.RegisterAttached("VerticalOffsetBinding", typeof(bool?), typeof(ScrollViewerBinding));
 
+        /// <summary>
+        /// Gets vertical offset property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <returns>The property value.</returns>
         public static double GetVerticalOffset(DependencyObject depObj)
         {
             if (!(depObj is ScrollViewer))
+            {
                 return 0;
+            }
 
             return (double)depObj.GetValue(VerticalOffsetProperty);
         }
 
+        /// <summary>
+        /// Sets vertical offset property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <param name="value">The new property value.</param>
         public static void SetVerticalOffset(DependencyObject depObj, double value)
         {
             if (!(depObj is ScrollViewer))
+            {
                 return;
+            }
 
             depObj.SetValue(VerticalOffsetProperty, value);
         }
@@ -54,7 +73,9 @@ namespace MeoAsstGui
         private static void OnVerticalOffsetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is ScrollViewer scrollViewer))
+            {
                 return;
+            }
 
             BindVerticalOffset(scrollViewer);
             scrollViewer.ScrollToVerticalOffset((double)e.NewValue);
@@ -63,13 +84,18 @@ namespace MeoAsstGui
         private static void BindVerticalOffset(ScrollViewer scrollViewer)
         {
             if (scrollViewer.GetValue(VerticalOffsetBindingProperty) != null)
+            {
                 return;
+            }
 
             scrollViewer.SetValue(VerticalOffsetBindingProperty, true);
             scrollViewer.ScrollChanged += (s, se) =>
             {
                 if (se.VerticalChange == 0)
+                {
                     return;
+                }
+
                 SetVerticalOffset(scrollViewer, se.VerticalOffset);
             };
         }
@@ -78,6 +104,9 @@ namespace MeoAsstGui
 
         #region ViewportHeight attached property
 
+        /// <summary>
+        /// The viewport height property.
+        /// </summary>
         public static readonly DependencyProperty ViewportHeightProperty =
             DependencyProperty.RegisterAttached("ViewportHeight", typeof(double),
             typeof(ScrollViewerBinding), new FrameworkPropertyMetadata(double.NaN,
@@ -87,18 +116,32 @@ namespace MeoAsstGui
         private static readonly DependencyProperty ViewportHeightBindingProperty =
             DependencyProperty.RegisterAttached("ViewportHeightBinding", typeof(bool?), typeof(ScrollViewerBinding));
 
+        /// <summary>
+        /// Gets viewport height property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <returns>The property value.</returns>
         public static double GetViewportHeight(DependencyObject depObj)
         {
             if (!(depObj is ScrollViewer scrollViewer))
+            {
                 return double.NaN;
+            }
 
             return scrollViewer.ViewportHeight;
         }
 
+        /// <summary>
+        /// Sets viewport height property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <param name="value">The new property value.</param>
         public static void SetViewportHeight(DependencyObject depObj, double value)
         {
             if (!(depObj is ScrollViewer))
+            {
                 return;
+            }
 
             depObj.SetValue(ViewportHeightProperty, value);
         }
@@ -106,7 +149,9 @@ namespace MeoAsstGui
         private static void OnViewportHeightPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is ScrollViewer scrollViewer))
+            {
                 return;
+            }
 
             BindViewportHeight(scrollViewer);
         }
@@ -114,7 +159,9 @@ namespace MeoAsstGui
         private static void BindViewportHeight(ScrollViewer scrollViewer)
         {
             if (scrollViewer.GetValue(ViewportHeightBindingProperty) != null)
+            {
                 return;
+            }
 
             scrollViewer.SetValue(ViewportHeightBindingProperty, true);
 
@@ -133,6 +180,9 @@ namespace MeoAsstGui
 
         #region ExtentHeight attached property
 
+        /// <summary>
+        /// The extent height property.
+        /// </summary>
         public static readonly DependencyProperty ExtentHeightProperty =
             DependencyProperty.RegisterAttached("ExtentHeight", typeof(double),
             typeof(ScrollViewerBinding), new FrameworkPropertyMetadata(double.NaN,
@@ -142,18 +192,32 @@ namespace MeoAsstGui
         private static readonly DependencyProperty ExtentHeightBindingProperty =
             DependencyProperty.RegisterAttached("ExtentHeightBinding", typeof(bool?), typeof(ScrollViewerBinding));
 
+        /// <summary>
+        /// Gets extent height property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <returns>The property value.</returns>
         public static double GetExtentHeight(DependencyObject depObj)
         {
             if (!(depObj is ScrollViewer scrollViewer))
+            {
                 return double.NaN;
+            }
 
             return scrollViewer.ExtentHeight;
         }
 
+        /// <summary>
+        /// Sets extent height property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <param name="value">The new property value.</param>
         public static void SetExtentHeight(DependencyObject depObj, double value)
         {
             if (!(depObj is ScrollViewer))
+            {
                 return;
+            }
 
             depObj.SetValue(ExtentHeightProperty, value);
         }
@@ -161,7 +225,9 @@ namespace MeoAsstGui
         private static void OnExtentHeightPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is ScrollViewer scrollViewer))
+            {
                 return;
+            }
 
             BindExtentHeight(scrollViewer);
         }
@@ -169,7 +235,9 @@ namespace MeoAsstGui
         private static void BindExtentHeight(ScrollViewer scrollViewer)
         {
             if (scrollViewer.GetValue(ExtentHeightBindingProperty) != null)
+            {
                 return;
+            }
 
             scrollViewer.SetValue(ExtentHeightBindingProperty, true);
 
@@ -184,7 +252,7 @@ namespace MeoAsstGui
         #region RectangleVerticalOffsetList attached property
 
         /// <summary>
-        /// RectangleIndex attached property
+        /// RectangleIndex attached property.
         /// </summary>
         public static readonly DependencyProperty RectangleVerticalOffsetListProperty =
             DependencyProperty.RegisterAttached("RectangleVerticalOffsetList",
@@ -201,15 +269,27 @@ namespace MeoAsstGui
         private static readonly DependencyProperty RectangleVerticalOffsetListBindingProperty =
             DependencyProperty.RegisterAttached("RectangleVerticalOffsetListBinding", typeof(bool?), typeof(ScrollViewerBinding));
 
+        /// <summary>
+        /// Gets rectangle vertical offset property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <returns>The property value.</returns>
         public static List<double> GetRectangleVerticalOffsetList(DependencyObject depObj)
         {
             return (List<double>)depObj.GetValue(RectangleVerticalOffsetListProperty);
         }
 
+        /// <summary>
+        /// Sets rectangle vertical offset property.
+        /// </summary>
+        /// <param name="depObj">The <see cref="DependencyObject"/> instance.</param>
+        /// <param name="value">The new property value.</param>
         public static void SetRectangleVerticalOffsetList(DependencyObject depObj, List<double> value)
         {
             if (!(depObj is ScrollViewer))
+            {
                 return;
+            }
 
             depObj.SetValue(RectangleVerticalOffsetListProperty, value);
         }
@@ -217,7 +297,9 @@ namespace MeoAsstGui
         private static void OnRectangleVerticalOffsetListPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is ScrollViewer scrollViewer))
+            {
                 return;
+            }
 
             BindRectangleVerticalOffsetList(scrollViewer);
         }
@@ -225,7 +307,9 @@ namespace MeoAsstGui
         private static void BindRectangleVerticalOffsetList(ScrollViewer scrollViewer)
         {
             if (scrollViewer.GetValue(RectangleVerticalOffsetListBindingProperty) != null)
+            {
                 return;
+            }
 
             scrollViewer.SetValue(RectangleVerticalOffsetListBindingProperty, true);
 
@@ -233,7 +317,9 @@ namespace MeoAsstGui
             scrollViewer.Loaded += (s, se) =>
             {
                 if (!scrollViewer.HasContent || !(scrollViewer.Content is StackPanel))
+                {
                     return;
+                }
 
                 var rectangleOffsetList = new List<double>();
                 var stackPanel = (StackPanel)scrollViewer.Content;
@@ -243,7 +329,9 @@ namespace MeoAsstGui
                 {
                     // 以 Rectangle 为定位元素
                     if (!(child is Rectangle))
+                    {
                         continue;
+                    }
 
                     // 转换计算并保存 Rectangle 在滚动面板中的垂直位置
                     var targetPosition = ((FrameworkElement)child).TransformToVisual(scrollViewer).Transform(point);
@@ -251,7 +339,9 @@ namespace MeoAsstGui
                 }
 
                 if (rectangleOffsetList.Count > 0)
+                {
                     SetRectangleVerticalOffsetList(scrollViewer, rectangleOffsetList);
+                }
             };
         }
 

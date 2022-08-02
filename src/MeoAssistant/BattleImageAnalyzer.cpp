@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "NoWarningCV.h"
+
 #include "MultiMatchImageAnalyzer.h"
 #include "MatchImageAnalyzer.h"
 #include "OcrWithFlagTemplImageAnalyzer.h"
@@ -109,6 +111,12 @@ void asst::BattleImageAnalyzer::clear() noexcept
     m_hp = 0;
     m_kills = 0;
     m_cost = 0;
+}
+
+void asst::BattleImageAnalyzer::sort_opers_by_cost()
+{
+    // 本来游戏就是按费用排的，这里倒序一下就行了
+    std::reverse(m_opers.begin(), m_opers.end());
 }
 
 bool asst::BattleImageAnalyzer::opers_analyze()
@@ -222,19 +230,24 @@ bool asst::BattleImageAnalyzer::oper_cooling_analyze(const Rect& roi)
 {
     const auto cooling_task_ptr = Task.get<MatchTaskInfo>("BattleOperCooling");
 
+    auto img_roi = m_image(utils::make_rect<cv::Rect>(roi));
     cv::Mat hsv;
-    cv::cvtColor(m_image(utils::make_rect<cv::Rect>(roi)), hsv, cv::COLOR_BGR2HSV);
-    std::vector<cv::Mat> channels;
-    cv::split(hsv, channels);
-    int mask_lowb = cooling_task_ptr->mask_range.first;
-    int mask_uppb = cooling_task_ptr->mask_range.second;
+    cv::cvtColor(img_roi, hsv, cv::COLOR_BGR2HSV);
+    int h_low = cooling_task_ptr->mask_range.first;
+    int h_up = cooling_task_ptr->mask_range.second;
+    int s_low = cooling_task_ptr->specific_rect.x;
+    int s_up = cooling_task_ptr->specific_rect.y;
+    int v_low = cooling_task_ptr->specific_rect.width;
+    int v_up = cooling_task_ptr->specific_rect.height;
+
+    cv::Mat bin;
+    cv::inRange(hsv, cv::Scalar(h_low, s_low, v_low), cv::Scalar(h_up, s_up, v_up), bin);
 
     int count = 0;
-    auto& h_channel = channels.at(0);
-    for (int i = 0; i != h_channel.rows; ++i) {
-        for (int j = 0; j != h_channel.cols; ++j) {
-            cv::uint8_t value = h_channel.at<cv::uint8_t>(i, j);
-            if (mask_lowb < value && value < mask_uppb) {
+    for (int i = 0; i != bin.rows; ++i) {
+        for (int j = 0; j != bin.cols; ++j) {
+            cv::uint8_t value = bin.at<cv::uint8_t>(i, j);
+            if (value) {
                 ++count;
             }
         }
@@ -264,7 +277,7 @@ int asst::BattleImageAnalyzer::oper_cost_analyze(const Rect& roi)
         std::unordered_map<std::string, std::string> num_hashs;
         for (auto&& num : NumName) {
             auto hashs_vec = std::dynamic_pointer_cast<HashTaskInfo>(
-                Task.get("BattleOperCost" + num))->hashs;
+                Task.get("BattleOperCost" + num))->hashes;
             for (size_t i = 0; i != hashs_vec.size(); ++i) {
                 num_hashs.emplace(num + "_" + std::to_string(i), hashs_vec.at(i));
             }
@@ -407,7 +420,7 @@ bool asst::BattleImageAnalyzer::hp_analyze()
         std::unordered_map<std::string, std::string> num_hashs;
         for (auto&& num : NumName) {
             const auto& hashs_vec = std::dynamic_pointer_cast<HashTaskInfo>(
-                Task.get("BattleHp" + num))->hashs;
+                Task.get("BattleHp" + num))->hashes;
             for (size_t i = 0; i != hashs_vec.size(); ++i) {
                 num_hashs.emplace(num + "_" + std::to_string(i), hashs_vec.at(i));
             }

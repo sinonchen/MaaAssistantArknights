@@ -10,7 +10,7 @@ namespace asst
     public:
         using AbstractImageAnalyzer::AbstractImageAnalyzer;
         RecruitImageAnalyzer(const cv::Mat image, const Rect& roi) = delete;
-        virtual ~RecruitImageAnalyzer() = default;
+        virtual ~RecruitImageAnalyzer() override = default;
 
         virtual bool analyze() override;
 
@@ -43,7 +43,6 @@ namespace asst
         }
         bool tags_analyze();
         bool time_analyze();
-        bool confirm_analyze();
         bool refresh_analyze();
 
         std::vector<TextRect> m_tags_result;

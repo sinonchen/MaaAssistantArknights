@@ -1,3 +1,4 @@
+// <copyright file="CombData.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,15 +9,13 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
 namespace MeoAsstGui
 {
-    public class GenericCombData<ValueType>
-    {
-        public string Display { get; set; }
-        public ValueType Value { get; set; }
-    }
-
+    /// <summary>
+    /// The <see cref="GenericCombData{TValueType}"/> with <see cref="string"/> as the value type.
+    /// </summary>
     public class CombData : GenericCombData<string>
     {
     }

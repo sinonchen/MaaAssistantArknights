@@ -1,3 +1,4 @@
+// <copyright file="ViewStatusStorage.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,6 +9,7 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
 using System;
 using System.IO;
@@ -16,13 +18,21 @@ using Newtonsoft.Json.Linq;
 
 namespace MeoAsstGui
 {
-    // 界面设置存储（读写json文件）
+    /// <summary>
+    /// 界面设置存储（读写json文件）
+    /// </summary>
     public class ViewStatusStorage
     {
-        private static readonly string _configFilename = System.Environment.CurrentDirectory + "\\gui.json";
-        private static readonly string _configBakFilename = System.Environment.CurrentDirectory + "\\gui.json.bak";
+        private static readonly string _configFilename = Environment.CurrentDirectory + "\\gui.json";
+        private static readonly string _configBakFilename = Environment.CurrentDirectory + "\\gui.json.bak";
         private static JObject _viewStatus = new JObject();
 
+        /// <summary>
+        /// Gets the value of a key with default value.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="default_value">The default value.</param>
+        /// <returns>The value, or <paramref name="default_value"/> if <paramref name="key"/> is not found.</returns>
         public static string Get(string key, string default_value)
         {
             if (_viewStatus.ContainsKey(key))
@@ -35,12 +45,22 @@ namespace MeoAsstGui
             }
         }
 
+        /// <summary>
+        /// Sets a key with a value.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value.</param>
         public static void Set(string key, string value)
         {
             _viewStatus[key] = value;
             Save();
         }
 
+        /// <summary>
+        /// Loads configuration.
+        /// </summary>
+        /// <param name="withRestore">Whether to restore with backup file.</param>
+        /// <returns>Whether the operation is successful.</returns>
         public static bool Load(bool withRestore = true)
         {
             if (File.Exists(_configFilename))
@@ -77,9 +97,14 @@ namespace MeoAsstGui
                 _viewStatus = new JObject();
                 return false;
             }
+
             return true;
         }
 
+        /// <summary>
+        /// Saves configuration.
+        /// </summary>
+        /// <returns>Whether the operation is successful.</returns>
         public static bool Save()
         {
             try
@@ -91,7 +116,8 @@ namespace MeoAsstGui
                     {
                         sw.Write(jsonStr);
                     }
-                    if (new System.IO.FileInfo(_configFilename).Length > 2)
+
+                    if (new FileInfo(_configFilename).Length > 2)
                     {
                         File.Copy(_configFilename, _configBakFilename, true);
                     }
@@ -101,6 +127,7 @@ namespace MeoAsstGui
             {
                 return false;
             }
+
             return true;
         }
     }

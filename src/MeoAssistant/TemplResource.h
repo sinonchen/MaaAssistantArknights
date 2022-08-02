@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <opencv2/opencv.hpp>
+#include "NoWarningCVMat.h"
 
 namespace asst
 {
@@ -13,7 +13,7 @@ namespace asst
     {
     public:
 
-        virtual ~TemplResource() = default;
+        virtual ~TemplResource() override = default;
 
         void set_load_required(std::unordered_set<std::string> required) noexcept;
         virtual bool load(const std::string& dir) override;

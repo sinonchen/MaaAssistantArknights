@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+
 #include "AbstractTaskPlugin.h"
 #include "AsstTypes.h"
 #include "TilePack.h"
@@ -13,7 +15,7 @@ namespace asst
         using Loc = asst::TilePack::BuildableType;
     public:
         using AbstractTaskPlugin::AbstractTaskPlugin;
-        virtual ~RoguelikeBattleTaskPlugin() = default;
+        virtual ~RoguelikeBattleTaskPlugin() override = default;
 
         virtual bool verify(AsstMsg msg, const json::value& details) const override;
 
@@ -41,11 +43,11 @@ namespace asst
             Point direction;
         };
 
-        DeployInfo calc_best_plan(BattleRole role);
+        DeployInfo calc_best_plan(const BattleRealTimeOper& oper);
 
         // 计算摆放干员的朝向
         // 返回滑动的方向、得分
-        std::pair<Point, int> calc_best_direction_and_score(Point loc, BattleRole role);
+        std::pair<Point, int> calc_best_direction_and_score(Point loc, const BattleRealTimeOper& oper);
 
         bool m_opers_used = false;
         int m_pre_hp = 0;

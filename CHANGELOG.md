@@ -1,6 +1,20 @@
-- 新增支持 `多索雷斯假日` 活动关卡导航 @ABA2396
-- 更新 `多索雷斯假日` 活动关卡地图数据 @yuanyan3060 @MistEO
-- 修复 `多索雷斯假日` 部分关卡自动战斗击杀数识别错误 @MistEO
-- 修复 `多索雷斯假日` 误报 `电子晶体元件` 的问题 @MistEO
-
-~~这个活动掉落是代币，不是材料，要单独整理资源比较麻烦，于是摆烂了~~
+- New support for interface English, 日本語, 한국어, 繁體中文 and 🐮🍷 translation.  
+  It was a difficult task, thanks to all collaborators: @ABA2396 @ChingCdesu @LYZhelloworld @Tastror @cloakWatcher @lsequeiraa @MistEO
+- 新增支持 肉鸽 开局自定义分队、自定义职业组、自定义干员（仅国服） @MistEO @ABA2396
+- 新增支持 肉鸽 商店 根据已有干员决定购买哪些物品，并优化购买策略（仅国服） @MistEO @ABA2396
+- 新增支持 肉鸽 商店 购买 `金酒之杯` 类商品后，不再额外购买其他商品（仅国服） @MistEO
+- 优化 肉鸽 干员部署策略、招募策略 @MistEO @ABA2396 @et2012
+- 重构并优化 公招 功能 @horror-proton
+- 优化 刷理智 `上次/当前` 功能，合并为一个选项 @MistEO
+- 优化 项目 CI/CD 工程 @LiamSho @zzyyyl
+- 优化并修复 界面 一些小问题 @ABA2396 @zzyyyl @MistEO
+- 修复 肉鸽 干员编队时干员技能选择错误 @MistEO
+- 修复 美服肉鸽 几个卡住的问题 @AkarinVS @MistEO
+- 修复 自动战斗 `安洁莉娜` 不部署的问题 @MistEO
+- 修复 刷理智 偶现掉落识别错误 @MistEO @ABA2396
+- 修复 基建 会客室送线索时卡住问题 @MistEO
+- 新增支持 Rust HTTP 接口 @yuanyan3060
+- 代码清理并升级到 C++20 @lhhxxxxx @LiamSho @zzyyyl @LYZhelloworld @horror-proton @MistEO
+- 新增 日文 文档翻译 @LYZhelloworld
+- 修复 Linux 编译错误 @zhangchi0104
+- 修改 信用商店 购物名单为分号分割（中英皆可），请注意重新设置 @MistEO @ABA2396

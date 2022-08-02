@@ -1,18 +1,5 @@
 [
     {
-        "stage_name": "驯兽小屋",
-        "replacement_home": [
-            [
-                8,
-                3
-            ],
-            [
-                8,
-                4
-            ]
-        ]
-    },
-    {
         "stage_name": "巡逻队",
         "replacement_home": [
             [
@@ -29,8 +16,8 @@
         "stage_name": "压轴登场",
         "replacement_home": [
             [
-                2,
-                2
+                3,
+                4
             ]
         ]
     },
@@ -77,15 +64,6 @@
             ],
             [
                 5,
-                4
-            ]
-        ]
-    },
-    {
-        "stage_name": "恐怖传说",
-        "replacement_home": [
-            [
-                0,
                 4
             ]
         ]
@@ -227,6 +205,15 @@
             [
                 3,
                 4
+            ]
+        ]
+    },
+    {
+        "stage_name": "悦耳杀机",
+        "replacement_home": [
+            [
+                6,
+                6
             ]
         ]
     }

@@ -25,7 +25,9 @@
     <ClInclude Include="AsstMsg.h" />
     <ClInclude Include="AutoRecruitTask.h" />
     <ClInclude Include="AwardTask.h" />
+    <ClInclude Include="BattleDataConfiger.h" />
     <ClInclude Include="CloseDownTask.h" />
+    <ClInclude Include="AsstConf.h" />
     <ClInclude Include="CopilotConfiger.h" />
     <ClInclude Include="BattleFormationTask.h" />
     <ClInclude Include="BattleImageAnalyzer.h" />
@@ -34,7 +36,10 @@
     <ClInclude Include="DepotRecognitionTask.h" />
     <ClInclude Include="DepotTask.h" />
     <ClInclude Include="GameCrashRestartTaskPlugin.h" />
+    <ClInclude Include="NoWarningCV.h" />
+    <ClInclude Include="NoWarningCVMat.h" />
     <ClInclude Include="RoguelikeControlTaskPlugin.h" />
+    <ClInclude Include="RoguelikeCustomStartTaskPlugin.h" />
     <ClInclude Include="RoguelikeRecruitConfiger.h" />
     <ClInclude Include="CopilotTask.h" />
     <ClInclude Include="DebugTask.h" />
@@ -75,7 +80,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ItemConfiger.h" />
     <ClInclude Include="Logger.hpp" />
-    <ClInclude Include="RecruitCalcTask.h" />
     <ClInclude Include="ProcessTask.h" />
     <ClInclude Include="ProcessTaskImageAnalyzer.h" />
     <ClInclude Include="RecruitConfiger.h" />
@@ -84,6 +88,9 @@
     <ClInclude Include="RoguelikeFormationImageAnalyzer.h" />
     <ClInclude Include="RoguelikeRecruitImageAnalyzer.h" />
     <ClInclude Include="RoguelikeRecruitTaskPlugin.h" />
+    <ClInclude Include="RoguelikeResetTaskPlugin.h" />
+    <ClInclude Include="RoguelikeShoppingConfiger.h" />
+    <ClInclude Include="RoguelikeShoppingTaskPlugin.h" />
     <ClInclude Include="RoguelikeSkillSelectionImageAnalyzer.h" />
     <ClInclude Include="RoguelikeSkillSelectionTaskPlugin.h" />
     <ClInclude Include="RoguelikeTask.h" />
@@ -110,6 +117,7 @@
     <ClCompile Include="AbstractTaskPlugin.cpp" />
     <ClCompile Include="AutoRecruitTask.cpp" />
     <ClCompile Include="AwardTask.cpp" />
+    <ClCompile Include="BattleDataConfiger.cpp" />
     <ClCompile Include="CloseDownTask.cpp" />
     <ClCompile Include="CopilotConfiger.cpp" />
     <ClCompile Include="BattleFormationTask.cpp" />
@@ -120,6 +128,7 @@
     <ClCompile Include="DepotTask.cpp" />
     <ClCompile Include="GameCrashRestartTaskPlugin.cpp" />
     <ClCompile Include="RoguelikeControlTaskPlugin.cpp" />
+    <ClCompile Include="RoguelikeCustomStartTaskPlugin.cpp" />
     <ClCompile Include="RoguelikeRecruitConfiger.cpp" />
     <ClCompile Include="CopilotTask.cpp" />
     <ClCompile Include="DebugTask.cpp" />
@@ -161,7 +170,6 @@
     <ClCompile Include="AsstCaller.cpp" />
     <ClCompile Include="GeneralConfiger.cpp" />
     <ClCompile Include="ItemConfiger.cpp" />
-    <ClCompile Include="RecruitCalcTask.cpp" />
     <ClCompile Include="ProcessTask.cpp" />
     <ClCompile Include="ProcessTaskImageAnalyzer.cpp" />
     <ClCompile Include="RecruitConfiger.cpp" />
@@ -170,6 +178,9 @@
     <ClCompile Include="RoguelikeFormationImageAnalyzer.cpp" />
     <ClCompile Include="RoguelikeRecruitImageAnalyzer.cpp" />
     <ClCompile Include="RoguelikeRecruitTaskPlugin.cpp" />
+    <ClCompile Include="RoguelikeResetTaskPlugin.cpp" />
+    <ClCompile Include="RoguelikeShoppingConfiger.cpp" />
+    <ClCompile Include="RoguelikeShoppingTaskPlugin.cpp" />
     <ClCompile Include="RoguelikeSkillSelectionImageAnalyzer.cpp" />
     <ClCompile Include="RoguelikeSkillSelectionTaskPlugin.cpp" />
     <ClCompile Include="RoguelikeTask.cpp" />
@@ -192,6 +203,7 @@
     <None Include="..\..\resource\infrast.json" />
     <None Include="..\..\resource\roguelike_copilot.json" />
     <None Include="..\..\resource\roguelike_recruit.json" />
+    <None Include="..\..\resource\roguelike_shopping.json" />
     <None Include="..\..\resource\tasks.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -248,7 +260,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;ASST_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>MaxSpeed</Optimization>
@@ -298,7 +310,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;ASST_DLL_EXPORTS;ASST_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>

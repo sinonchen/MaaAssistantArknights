@@ -1,3 +1,4 @@
+// <copyright file="CopilotViewModel.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,6 +9,7 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
 using System;
 using System.Collections.Generic;
@@ -27,69 +29,111 @@ using Screen = Stylet.Screen;
 
 namespace MeoAsstGui
 {
+    /// <summary>
+    /// The view model of copilot.
+    /// </summary>
     public class CopilotViewModel : Screen
     {
         private readonly IWindowManager _windowManager;
         private readonly IContainer _container;
+
+        /// <summary>
+        /// Gets or sets the view models of log items.
+        /// </summary>
         public ObservableCollection<LogItemViewModel> LogItemViewModels { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CopilotViewModel"/> class.
+        /// </summary>
+        /// <param name="container">The IoC container.</param>
+        /// <param name="windowManager">The window manager.</param>
         public CopilotViewModel(IContainer container, IWindowManager windowManager)
         {
             _container = container;
             _windowManager = windowManager;
-            DisplayName = "自动战斗 Beta";
+            DisplayName = Localization.GetString("Copilot");
             LogItemViewModels = new ObservableCollection<LogItemViewModel>();
-            AddLog("小提示：\n\n请将模拟器及游戏帧率设置到 60 帧或更高；\n\n请在有“开始行动”按钮的界面再使用本功能；\n\n使用好友助战可以关闭“自动编队”，手动选择干员后开始；\n\n模拟悖论需要关闭“自动编队”，并选好技能后处于“开始模拟”按钮的界面再开始；\n\n自动编队暂时无法识别“特别关注”的干员，如有需求请取消特别关注或手动编队；", "dark");
+            AddLog(
+                Localization.GetString("CopilotTip") + "\n\n" +
+                Localization.GetString("CopilotTip1") + "\n\n" +
+                Localization.GetString("CopilotTip2") + "\n\n" +
+                Localization.GetString("CopilotTip3") + "\n\n" +
+                Localization.GetString("CopilotTip4") + "\n\n" +
+                Localization.GetString("CopilotTip5"),
+                "dark");
         }
 
+        /// <summary>
+        /// Adds log.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="color">The font color.</param>
+        /// <param name="weight">The font weight.</param>
         public void AddLog(string content, string color = "Gray", string weight = "Regular")
         {
             LogItemViewModels.Add(new LogItemViewModel(content, color, weight));
-            //LogItemViewModels.Insert(0, new LogItemViewModel(time + content, color, weight));
+
+            // LogItemViewModels.Insert(0, new LogItemViewModel(time + content, color, weight));
         }
 
+        /// <summary>
+        /// Adds log with URL.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="url">The URL.</param>
+        /// <param name="color">The font color.</param>
+        /// <param name="weight">The font weight.</param>
         public void AddLogWithUrl(string content, string url, string color = "Gray", string weight = "Regular")
         {
             LogItemViewModels.Add(new LogItemViewModel(content, color, weight));
-            //LogItemViewModels.Insert(0, new LogItemViewModel(time + content, color, weight));
+
+            // LogItemViewModels.Insert(0, new LogItemViewModel(time + content, color, weight));
         }
 
-        private bool _idel = true;
+        private bool _idle = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether it is idle.
+        /// </summary>
         public bool Idle
         {
-            get => _idel;
+            get => _idle;
             set
             {
-                _idel = value;
+                _idle = value;
                 NotifyOfPropertyChange(() => Idle);
             }
         }
 
+        /// <summary>
+        /// Clears log.
+        /// </summary>
         public void ClearLog()
         {
             LogItemViewModels.Clear();
         }
 
-        private string _filename = "";
+        private string _filename = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the filename.
+        /// </summary>
         public string Filename
         {
             get => _filename;
             set
             {
                 SetAndNotify(ref _filename, value);
-                _updateFileDoc(_filename);
+                ClearLog();
+                UpdateFileDoc(_filename);
             }
         }
 
         private readonly string CopilotIdPrefix = "maa://";
 
-        private void _updateFileDoc(string filename)
+        private void UpdateFileDoc(string filename)
         {
-            ClearLog();
-
-            string jsonStr = "";
+            string jsonStr = string.Empty;
             if (File.Exists(filename))
             {
                 try
@@ -98,31 +142,31 @@ namespace MeoAsstGui
                 }
                 catch (Exception)
                 {
-                    AddLog("读取文件失败！", "DarkRed");
+                    AddLog(Localization.GetString("CopilotFileReadError"), "DarkRed");
                     return;
                 }
             }
-            else if (Int32.TryParse(filename, out _))
+            else if (int.TryParse(filename, out _))
             {
-                int copilotID = 0;
-                Int32.TryParse(filename, out copilotID);
-                jsonStr = _requestCopilotServer(copilotID);
+                int copilotID;
+                int.TryParse(filename, out copilotID);
+                jsonStr = RequestCopilotServer(copilotID);
             }
             else if (filename.ToLower().StartsWith(CopilotIdPrefix))
             {
                 var copilotIdStr = filename.ToLower().Remove(0, CopilotIdPrefix.Length);
-                int copilotID = 0;
-                Int32.TryParse(copilotIdStr, out copilotID);
-                jsonStr = _requestCopilotServer(copilotID);
+                int copilotID;
+                int.TryParse(copilotIdStr, out copilotID);
+                jsonStr = RequestCopilotServer(copilotID);
             }
 
-            if (jsonStr != String.Empty)
+            if (jsonStr != string.Empty)
             {
-                _parseJsonAndShowInfo(jsonStr);
+                ParseJsonAndShowInfo(jsonStr);
             }
         }
 
-        private string _requestCopilotServer(int copilotID)
+        private string RequestCopilotServer(int copilotID)
         {
             try
             {
@@ -131,6 +175,7 @@ namespace MeoAsstGui
                 httpWebRequest.Method = "GET";
                 httpWebRequest.ContentType = "application/json";
                 var httpWebResponse = httpWebRequest.GetResponse() as HttpWebResponse;
+
                 // 获取输入输出流
                 using (var sr = new StreamReader(httpWebResponse.GetResponseStream()))
                 {
@@ -142,40 +187,42 @@ namespace MeoAsstGui
                     }
                     else
                     {
-                        AddLog("未找到对应作业！", "DarkRed");
-                        return String.Empty;
+                        AddLog(Localization.GetString("CopilotNoFound"), "DarkRed");
+                        return string.Empty;
                     }
                 }
             }
             catch (Exception)
             {
-                AddLog("请求网络服务错误！", "DarkRed");
-                return String.Empty;
+                AddLog(Localization.GetString("NetworkServiceError"), "DarkRed");
+                return string.Empty;
             }
         }
 
-        private string _curStageName = "";
-        private string _curCopilotData = "";
+        private string _curStageName = string.Empty;
+        private string _curCopilotData = string.Empty;
         private const string _tempCopilotFile = "resource/_temp_copilot.json";
 
-        private void _parseJsonAndShowInfo(string jsonStr)
+        private void ParseJsonAndShowInfo(string jsonStr)
         {
             try
             {
-                _curCopilotData = "";
+                _curCopilotData = string.Empty;
                 var json = (JObject)JsonConvert.DeserializeObject(jsonStr);
                 if (json == null || !json.ContainsKey("doc"))
                 {
-                    AddLog("解析作业文件错误！", "DarkRed");
+                    AddLog(Localization.GetString("CopilotJsonError"), "DarkRed");
                     return;
                 }
+
                 var doc = (JObject)json["doc"];
 
-                string title = "";
+                string title = string.Empty;
                 if (doc.ContainsKey("title"))
                 {
                     title = doc["title"].ToString();
                 }
+
                 if (title.Length != 0)
                 {
                     string title_color = "black";
@@ -183,14 +230,16 @@ namespace MeoAsstGui
                     {
                         title_color = doc["title_color"].ToString();
                     }
+
                     AddLog(title, title_color);
                 }
 
-                string details = "";
+                string details = string.Empty;
                 if (doc.ContainsKey("details"))
                 {
                     details = doc["details"].ToString();
                 }
+
                 if (details.Length != 0)
                 {
                     string details_color = "black";
@@ -198,10 +247,10 @@ namespace MeoAsstGui
                     {
                         details_color = doc["details_color"].ToString();
                     }
-                    AddLog(details, details_color);
 
+                    AddLog(details, details_color);
                     {
-                        Url = "";
+                        Url = string.Empty;
                         var linkParser = new Regex(@"(?:https?://)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
                         foreach (Match m in linkParser.Matches(details))
@@ -212,7 +261,7 @@ namespace MeoAsstGui
                     }
                 }
 
-                AddLog("", "black");
+                AddLog(string.Empty, "black");
                 int count = 0;
                 foreach (JObject oper in json["opers"])
                 {
@@ -225,32 +274,44 @@ namespace MeoAsstGui
                     foreach (JObject group in json["groups"])
                     {
                         count++;
-                        string group_name = group["name"].ToString() + ": ";
-                        var operinfos = new List<string>();
+                        string group_name = group["name"] + ": ";
+                        var operInfos = new List<string>();
                         foreach (JObject oper in group["opers"])
                         {
-                            operinfos.Add(string.Format("{0} {1}", oper["name"], oper["skill"]));
+                            operInfos.Add(string.Format("{0} {1}", oper["name"], oper["skill"]));
                         }
-                        AddLog(group_name + string.Join(" / ", operinfos), "black");
+
+                        AddLog(group_name + string.Join(" / ", operInfos), "black");
                     }
                 }
+
                 AddLog(string.Format("共 {0} 名干员", count), "black");
 
                 _curStageName = json["stage_name"].ToString();
                 _curCopilotData = json.ToString();
-                AddLog("\n\n小提示：\n请将模拟器及游戏帧率设置到 60 帧或更高；\n\n请在有“开始行动”按钮的界面再使用本功能；\n\n使用好友助战可以关闭“自动编队”，手动选择干员后开始；\n\n模拟悖论需要关闭“自动编队”，并选好技能后处于“开始模拟”按钮的界面再开始；\n\n自动编队暂时无法识别“特别关注”的干员，如有需求请取消特别关注或手动编队；");
+                AddLog(
+                    "\n\n" +
+                    Localization.GetString("CopilotTip") + "\n\n" +
+                    Localization.GetString("CopilotTip1") + "\n\n" +
+                    Localization.GetString("CopilotTip2") + "\n\n" +
+                    Localization.GetString("CopilotTip3") + "\n\n" +
+                    Localization.GetString("CopilotTip4") + "\n\n" +
+                    Localization.GetString("CopilotTip5"));
             }
             catch (Exception)
             {
-                AddLog("解析作业文件错误！", "DarkRed");
+                AddLog(Localization.GetString("CopilotJsonError"), "DarkRed");
             }
         }
 
+        /// <summary>
+        /// Selects file.
+        /// </summary>
         public void SelectFile()
         {
             var dialog = new Microsoft.Win32.OpenFileDialog();
 
-            dialog.Filter = "作业文件|*.json";
+            dialog.Filter = "JSON|*.json";
 
             if (dialog.ShowDialog() == true)
             {
@@ -258,65 +319,81 @@ namespace MeoAsstGui
             }
         }
 
+        /// <summary>
+        /// Drops file.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The event arguments.</param>
         public void DropFile(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 return;
             }
+
             var filename = ((Array)e.Data.GetData(DataFormats.FileDrop))?.GetValue(0).ToString();
             if (filename == null)
             {
                 return;
             }
+
             if (filename.EndsWith(".json"))
             {
                 Filename = filename;
             }
             else
             {
-                Filename = "";
+                Filename = string.Empty;
                 ClearLog();
-                AddLog("非作业文件", "darkred");
+                AddLog(Localization.GetString("NotCopilotJson"), "DarkRed");
             }
         }
 
         private bool _form = false;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to use auto-formation.
+        /// </summary>
         public bool Form
         {
             get => _form;
             set => SetAndNotify(ref _form, value);
         }
 
-        private bool _catched = false;
+        private bool _caught = false;
 
+        /// <summary>
+        /// Starts copilot.
+        /// </summary>
         public async void Start()
         {
             ClearLog();
             if (_form)
             {
-                AddLog("自动编队暂时无法识别“特别关注”的干员，如有需求请取消特别关注或手动编队", "dark");
+                AddLog(Localization.GetString("AutoSquadTip"), "dark");
             }
-            AddLog("正在连接模拟器……");
+
+            AddLog(Localization.GetString("ConnectingToEmulator"));
 
             var asstProxy = _container.Get<AsstProxy>();
-            string errMsg = "";
+            string errMsg = string.Empty;
             var task = Task.Run(() =>
             {
                 return asstProxy.AsstConnect(ref errMsg);
             });
-            _catched = await task;
-            if (!_catched)
+            _caught = await task;
+            if (!_caught)
             {
-                AddLog(errMsg, "darkred");
+                AddLog(errMsg, "DarkRed");
                 return;
             }
+
             if (errMsg.Length != 0)
             {
-                AddLog(errMsg, "darkred");
+                AddLog(errMsg, "DarkRed");
             }
 
+            UpdateFileDoc(Filename);
             File.Delete(_tempCopilotFile);
             File.WriteAllText(_tempCopilotFile, _curCopilotData);
 
@@ -328,10 +405,13 @@ namespace MeoAsstGui
             }
             else
             {
-                AddLog("读取 JSON 作业文件出错\n请检查文件内容", "darkred");
+                AddLog(Localization.GetString("CopilotFileReadError") + "\n" + Localization.GetString("CheckTheFile"), "DarkRed");
             }
         }
 
+        /// <summary>
+        /// Stops copilot.
+        /// </summary>
         public void Stop()
         {
             var asstProxy = _container.Get<AsstProxy>();
@@ -342,12 +422,18 @@ namespace MeoAsstGui
         private static readonly string CopilotUiUrl = "https://www.prts.plus/";
         private string _url = CopilotUiUrl;
 
+        /// <summary>
+        /// Gets or sets the copilot URL.
+        /// </summary>
         public string Url
         {
-            get => _url == CopilotUiUrl ? "作业分享站" : "视频链接";
+            get => _url == CopilotUiUrl ? Localization.GetString("CopilotJSONSharing") : Localization.GetString("VideoLink");
             set => SetAndNotify(ref _url, value);
         }
 
+        /// <summary>
+        /// The event handler of clicking hyperlink.
+        /// </summary>
         public void Hyperlink_Click()
         {
             try

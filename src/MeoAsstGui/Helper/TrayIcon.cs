@@ -1,3 +1,4 @@
+// <copyright file="TrayIcon.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,24 +9,28 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 
 namespace MeoAsstGui
 {
+    /// <summary>
+    /// 托盘图标。
+    /// </summary>
     public partial class TrayIcon
     {
-        private NotifyIcon notifyIcon = new NotifyIcon();
+        private readonly NotifyIcon notifyIcon = new NotifyIcon();
         private TaskQueueViewModel taskQueueViewModel;
-        private WindowState ws; //记录窗体状态
+        private SettingsViewModel settingsViewModel;
+        private WindowState ws; // 记录窗体状态
         private bool _isMinimizeToTaskbar = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrayIcon"/> class.
+        /// </summary>
         public TrayIcon()
         {
             InitIcon();
@@ -37,29 +42,60 @@ namespace MeoAsstGui
             this.notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
             notifyIcon.MouseClick += NotifyIcon_MouseClick;
             notifyIcon.MouseDoubleClick += OnNotifyIconDoubleClick;
-            App.Current.MainWindow.StateChanged += MainWindow_StateChanged;
+            System.Windows.Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
 
-            MenuItem startMenu = new System.Windows.Forms.MenuItem("开始长草");
+            MenuItem startMenu = new MenuItem(Localization.GetString("Farming"));
             startMenu.Click += StartTask;
-            MenuItem stopMenu = new System.Windows.Forms.MenuItem("全部停止");
+            MenuItem stopMenu = new MenuItem(Localization.GetString("Stop"));
             stopMenu.Click += StopTask;
-            MenuItem exitMenu = new System.Windows.Forms.MenuItem("退出");
+
+            MenuItem switchLangMenu = new MenuItem(Localization.GetString("SwitchLanguage"));
+
+            foreach (var lang in Localization.SupportedLanguages)
+            {
+                if (lang.Key == SettingsViewModel.PallasLangKey)
+                {
+                    continue;
+                }
+
+                var langMenu = new MenuItem(lang.Value);
+                langMenu.Click += (sender, e) =>
+                {
+                    settingsViewModel.Language = lang.Key;
+                };
+                switchLangMenu.MenuItems.Add(langMenu);
+            }
+
+            MenuItem exitMenu = new MenuItem(Localization.GetString("Exit"));
             exitMenu.Click += App_exit;
-            System.Windows.Forms.MenuItem[] menuItems = new MenuItem[] { startMenu, stopMenu, exitMenu };
-            this.notifyIcon.ContextMenu = new System.Windows.Forms.ContextMenu(menuItems);
+            MenuItem[] menuItems = new MenuItem[] { startMenu, stopMenu, switchLangMenu, exitMenu };
+            this.notifyIcon.ContextMenu = new ContextMenu(menuItems);
         }
+
         /// <summary>
-        /// 只应该在TaskQueueViewModel的构造函数中调用这个函数，不要传入一个随便new出来的TaskQueueViewModel
+        /// Sets task queue view model.
         /// </summary>
-        /// <param name="taskQueueViewModel">一个 不是 随便new出来的TaskQueueViewModel</param>
+        /// <param name="taskQueueViewModel">一个<b>不是随便 <see langword="new"/> 出来的</b> <see cref="TaskQueueViewModel"/></param>
+        /// <remarks>
+        /// 只应该在 <see cref="TaskQueueViewModel"/> 的构造函数中调用这个函数，不要传入一个随便 <see langword="new"/> 出来的 <see cref="TaskQueueViewModel"/>。
+        /// </remarks>
         public void SetTaskQueueViewModel(TaskQueueViewModel taskQueueViewModel)
         {
             this.taskQueueViewModel = taskQueueViewModel;
         }
 
+        /// <summary>
+        /// Sets settings view model.
+        /// </summary>
+        /// <param name="settingsViewModel">The settings view model.</param>
+        public void SetSettingsViewModel(SettingsViewModel settingsViewModel)
+        {
+            this.settingsViewModel = settingsViewModel;
+        }
+
         private void MainWindow_StateChanged(object sender, EventArgs e)
         {
-            ws = App.Current.MainWindow.WindowState;
+            ws = System.Windows.Application.Current.MainWindow.WindowState;
             if (ws == WindowState.Minimized)
             {
                 SetShowInTaskbar(false);
@@ -76,22 +112,23 @@ namespace MeoAsstGui
             {
                 return;
             }
+
             if (ws == WindowState.Minimized)
             {
-                ws = App.Current.MainWindow.WindowState = WindowState.Normal;
-                App.Current.MainWindow.Activate();
+                ws = System.Windows.Application.Current.MainWindow.WindowState = WindowState.Normal;
+                System.Windows.Application.Current.MainWindow.Activate();
                 SetShowInTaskbar(true);
             }
             else
             {
-                ws = App.Current.MainWindow.WindowState = WindowState.Minimized;
+                ws = System.Windows.Application.Current.MainWindow.WindowState = WindowState.Minimized;
                 SetShowInTaskbar(false);
             }
         }
 
         private void StartTask(object sender, EventArgs e)
         {
-            //taskQueueViewModel意外为null了是不是也可以考虑Log一下
+            // taskQueueViewModel意外为null了是不是也可以考虑Log一下
             taskQueueViewModel?.LinkStart();
         }
 
@@ -102,14 +139,14 @@ namespace MeoAsstGui
 
         private void App_exit(object sender, EventArgs e)
         {
-            App.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void App_show(object sender, EventArgs e)
         {
             SetShowInTaskbar(true);
-            ws = App.Current.MainWindow.WindowState = WindowState.Normal;
-            App.Current.MainWindow.Activate();
+            ws = System.Windows.Application.Current.MainWindow.WindowState = WindowState.Normal;
+            System.Windows.Application.Current.MainWindow.Activate();
         }
 
         private void OnNotifyIconDoubleClick(object sender, EventArgs e)
@@ -117,8 +154,8 @@ namespace MeoAsstGui
             if (ws == WindowState.Minimized)
             {
                 SetShowInTaskbar(true);
-                ws = App.Current.MainWindow.WindowState = WindowState.Normal;
-                App.Current.MainWindow.Activate();
+                ws = System.Windows.Application.Current.MainWindow.WindowState = WindowState.Normal;
+                System.Windows.Application.Current.MainWindow.Activate();
             }
         }
 
@@ -126,20 +163,31 @@ namespace MeoAsstGui
         {
             if (_isMinimizeToTaskbar)
             {
-                App.Current.MainWindow.ShowInTaskbar = state;
+                System.Windows.Application.Current.MainWindow.ShowInTaskbar = state;
             }
         }
 
+        /// <summary>
+        /// Sets visibility.
+        /// </summary>
+        /// <param name="visible">Whether it is visible.</param>
         public void SetVisible(bool visible)
         {
             notifyIcon.Visible = visible;
         }
 
+        /// <summary>
+        /// Sets whether to minimize to taskbar.
+        /// </summary>
+        /// <param name="enable">Whether to minimize to taskbar.</param>
         public void SetMinimizeToTaskbar(bool enable)
         {
             _isMinimizeToTaskbar = enable;
         }
 
+        /// <summary>
+        /// Closes this instance.
+        /// </summary>
         public void Close()
         {
             notifyIcon.Icon = null;

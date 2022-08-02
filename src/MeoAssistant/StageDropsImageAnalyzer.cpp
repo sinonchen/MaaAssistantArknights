@@ -1,5 +1,7 @@
 #include "StageDropsImageAnalyzer.h"
 
+#include "NoWarningCV.h"
+
 #include "TaskData.h"
 #include "OcrWithPreprocessImageAnalyzer.h"
 #include "MatchImageAnalyzer.h"
@@ -183,14 +185,24 @@ bool asst::StageDropsImageAnalyzer::analyze_drops()
     auto& ResrcItem = Resrc.item();
     bool has_error = false;
     const auto& roi = task_ptr->roi;
-    for (const auto& [baseline, droptype] : m_baseline) {
+    for (auto it = m_baseline.cbegin(); it != m_baseline.cend(); ++it) {
+        const auto& [baseline, drop_type] = *it;
+        bool is_first_drop_type = it == m_baseline.cbegin();
         int size = baseline.width / (roi.width + 10) + 1;   // + 10 为了带点容差
         for (int i = 1; i <= size; ++i) {
-            // 因为第一个黄色的 baseline 是渐变的，圈出来的一般左边会少一段，所以这里直接从右边开始往左推
-            int x = baseline.x + baseline.width - i * roi.width;
-            auto item_roi = Rect(x, baseline.y + roi.y, roi.width, roi.height);
+            Rect item_roi;
+            if (is_first_drop_type) {
+                // 因为第一个黄色的 baseline 是渐变的，圈出来的一般左边会少一段，所以这里直接从右边开始往左推
+                int x = baseline.x + baseline.width - i * roi.width;
+                item_roi = Rect(x, baseline.y + roi.y, roi.width, roi.height);
+            }
+            else {
+                // 其他的从左推
+                int x = baseline.x + (i - 1) * roi.width;
+                item_roi = Rect(x, baseline.y + roi.y, roi.width, roi.height);
+            }
 
-            std::string item = match_item(item_roi, droptype, size - i, size);
+            std::string item = match_item(item_roi, drop_type, size - i, size);
             int quantity = match_quantity(item_roi);
             Log.info("Item id:", item, ", quantity:", quantity);
 #ifdef ASST_DEBUG
@@ -206,7 +218,7 @@ bool asst::StageDropsImageAnalyzer::analyze_drops()
                 Log.warn(__FUNCTION__, "item id is empty");
             }
             StageDropInfo info;
-            info.droptype = droptype;
+            info.drop_type = drop_type;
             info.item_id = std::move(item);
             info.quantity = quantity;
 
@@ -223,7 +235,7 @@ bool asst::StageDropsImageAnalyzer::analyze_drops()
                 { StageDropType::Reward, "REWARD_DROP" },
                 { StageDropType::Unknown, "UNKNOWN_DROP" }
             };
-            info.droptype_name = DropTypeName.at(droptype);
+            info.drop_type_name = DropTypeName.at(drop_type);
 
             m_drops.emplace_back(std::move(info));
         }
@@ -245,6 +257,9 @@ bool asst::StageDropsImageAnalyzer::analyze_baseline()
 
     cv::Rect bounding_rect = cv::boundingRect(bin);
     cv::Mat bounding = gray(bounding_rect);
+    cv::Mat bgr_bounding = roi(bounding_rect);
+    cv::Mat hsv_bounding;
+    cv::cvtColor(bgr_bounding, hsv_bounding, cv::COLOR_BGR2HSV);
 
     int x_offset = task_ptr->roi.x + bounding_rect.x;
     int y_offset = task_ptr->roi.y + bounding_rect.y;
@@ -252,49 +267,62 @@ bool asst::StageDropsImageAnalyzer::analyze_baseline()
     const int min_width = static_cast<int>(task_ptr->special_threshold);
     const int max_spacing = static_cast<int>(task_ptr->templ_threshold);
 
-    int istart = 0, iend = bounding.cols - 1;
+    int i_start = 0, i_end = bounding.cols - 1;
     bool in = true;         // 是否正处在白线中
     int spacing = 0;
 
     // split
     int threshold = task_ptr->mask_range.first;
-    uchar pre_value = 0;
+    cv::Vec3i pre_hsv;
     for (int i = 0; i < bounding.cols; ++i) {
         uchar value = 0;
         for (int j = 0; j < bounding.rows; ++j) {
             value = std::max(value, bounding.at<uchar>(j, i));
         }
-        bool is_white = value > threshold && pre_value - value < 17;
-        pre_value = value;
+        cv::Vec3i hsv = hsv_bounding.at<cv::Vec3b>(0, i);
+
+        static const int h_threshold = task_ptr->rect_move.x;
+        static const int s_threshold = task_ptr->rect_move.y;
+        static const int v_threshold = task_ptr->rect_move.width;
+
+        bool is_white = value >= threshold;
+        if (pre_hsv != pre_hsv.zeros()) {
+            is_white &=
+                abs(pre_hsv[0] - hsv[0]) < h_threshold &&
+                abs(pre_hsv[1] - hsv[1]) < s_threshold &&
+                abs(pre_hsv[2] - hsv[2]) < v_threshold;
+        }
+
+        pre_hsv = hsv;
 
         if (in && !is_white) {
             in = false;
-            iend = i;
-            int width = iend - istart;
+            i_end = i;
+            int width = i_end - i_start;
             if (width < min_width) {
-                spacing += iend - istart;
+                spacing += i_end - i_start;
             }
             else {
                 spacing = 0;
-                Rect baseline{ x_offset + istart, y_offset, width, bounding_rect.height };
+                Rect baseline{ x_offset + i_start, y_offset, width, bounding_rect.height };
                 m_baseline.emplace_back(baseline, match_droptype(baseline));
             }
         }
         else if (!in && is_white) {
-            istart = i;
+            i_start = i;
             in = true;
         }
         else if (!in) {
-            if (++spacing > max_spacing && istart != 0) {
+            if (++spacing > max_spacing && i_start != 0) {
                 break;
             }
         }
     }
 
     if (in) {   // 最右边的白线贴着 bounding 边的情况
-        int width = bounding.cols - 1 - istart;
+        int width = bounding.cols - 1 - i_start;
         if (width >= min_width) {
-            Rect baseline{ x_offset + istart, y_offset, width, bounding_rect.height };
+            Rect baseline{ x_offset + i_start, y_offset, width, bounding_rect.height };
             m_baseline.emplace_back(baseline, match_droptype(baseline));
         }
     }
@@ -456,7 +484,7 @@ int asst::StageDropsImageAnalyzer::match_quantity(const Rect& roi)
     // split
     const int max_spacing = static_cast<int>(task_ptr->templ_threshold);
     std::vector<cv::Range> contours;
-    int iright = bin.cols - 1, ileft = 0;
+    int i_right = bin.cols - 1, i_left = 0;
     bool in = false;
     int spacing = 0;
 
@@ -469,18 +497,18 @@ int asst::StageDropsImageAnalyzer::match_quantity(const Rect& roi)
             }
         }
         if (in && !has_white) {
-            ileft = i;
+            i_left = i;
             in = false;
             spacing = 0;
-            contours.emplace_back(ileft, iright + 1);   // range 是前闭后开的
+            contours.emplace_back(i_left, i_right + 1);   // range 是前闭后开的
         }
         else if (!in && has_white) {
-            iright = i;
+            i_right = i;
             in = true;
         }
         else if (!in) {
             if (++spacing > max_spacing &&
-                ileft != 0) {
+                i_left != 0) {
                 // filter out noise
                 break;
             }

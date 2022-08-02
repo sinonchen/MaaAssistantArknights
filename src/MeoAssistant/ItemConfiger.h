@@ -4,13 +4,13 @@
 
 #include <unordered_map>
 #include <unordered_set>
-
+#include <vector>
 namespace asst
 {
     class ItemConfiger : public AbstractConfiger
     {
     public:
-        virtual ~ItemConfiger() = default;
+        virtual ~ItemConfiger() override = default;
 
         const std::string& get_item_name(const std::string& id) const noexcept
         {

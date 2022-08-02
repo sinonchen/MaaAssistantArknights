@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-#include <opencv2/core/mat.hpp>
+#include "NoWarningCVMat.h"
 
 #include "AsstTypes.h"
 
@@ -102,7 +102,7 @@ namespace asst
         Rect rect;
         cv::Mat avatar;
         std::string name;
-        size_t index;
+        size_t index = 0;
         bool cooling = false;
     };
 
@@ -112,4 +112,23 @@ namespace asst
         std::vector<Point> replacement_home;
         std::vector<int> key_kills;
     };
+
+    struct BattleCharData
+    {
+        std::string name;
+        BattleRole role;
+        std::array<std::string, 3> ranges;
+        int rarity = 0;
+    };
+
+    struct BattleRecruitOperInfo
+    {
+        std::string name;
+        Rect rect;
+        int elite = 0;
+        int level = 0;
+        bool required = false;
+    };
+
+    using BattleAttackRange = std::vector<Point>;
 }

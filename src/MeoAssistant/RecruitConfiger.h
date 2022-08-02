@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <algorithm>
+#include <numeric>
 
 #include "AsstTypes.h"
 
@@ -20,22 +22,75 @@ namespace asst
         std::unordered_set<std::string> tags;
         bool hidden = false;
         std::string name_en;
+
+        bool has_tag(const std::string &tag) const {
+            return tags.find(tag) != tags.cend();
+        }
+
+        friend bool operator<(const RecruitOperInfo& lhs, const RecruitOperInfo& rhs)
+        {
+            if (lhs.level != rhs.level) return lhs.level > rhs.level;
+            return lhs.name < rhs.name;
+        }
     };
 
     // 公开招募的干员组合
     struct RecruitCombs
     {
+        // TODO: using vector here can be expensive
         std::vector<std::string> tags;
         std::vector<RecruitOperInfo> opers;
         int max_level = 0;
         int min_level = 0;
         double avg_level = 0;
+
+        void update_attributes() {
+            min_level = std::transform_reduce(
+                    opers.cbegin(), opers.cend(), 7,
+                    [](int a, int b) -> int { return (std::min)(a, b); },
+                    std::mem_fn(&RecruitOperInfo::level));
+
+            max_level = std::transform_reduce(
+                    opers.cbegin(), opers.cend(), 0,
+                    [](int a, int b) -> int { return (std::max)(a, b); },
+                    std::mem_fn(&RecruitOperInfo::level));
+
+            avg_level = std::transform_reduce(
+                    opers.cbegin(), opers.cend(), 0.,
+                    std::plus<double>{},
+                    std::mem_fn(&RecruitOperInfo::level)) / static_cast<double>(opers.size());
+        }
+
+        // intersection of two recruit combs
+        friend RecruitCombs operator*(RecruitCombs& lhs, RecruitCombs& rhs)
+        {
+            std::sort(lhs.tags.begin(), lhs.tags.end());
+            std::sort(lhs.opers.begin(), lhs.opers.end());
+            std::sort(rhs.tags.begin(), rhs.tags.end());
+            std::sort(rhs.opers.begin(), rhs.opers.end());
+
+            RecruitCombs result;
+
+            std::set_union(
+                    lhs.tags.cbegin(), lhs.tags.cend(),
+                    rhs.tags.cbegin(), rhs.tags.cend(),
+                    std::back_inserter(result.tags));
+
+            std::set_intersection(
+                    lhs.opers.cbegin(), lhs.opers.cend(),
+                    rhs.opers.cbegin(), rhs.opers.cend(),
+                    std::back_inserter(result.opers));
+
+            result.update_attributes();
+
+            return result;
+        }
     };
 
     class RecruitConfiger : public AbstractConfiger
     {
     public:
-        virtual ~RecruitConfiger() = default;
+        virtual ~RecruitConfiger() override = default;
         constexpr static int CorrectNumberOfTags = 5;
 
         const std::unordered_set<std::string>& get_all_tags() const noexcept

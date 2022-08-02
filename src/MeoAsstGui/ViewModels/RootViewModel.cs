@@ -1,3 +1,4 @@
+// <copyright file="RootViewModel.cs" company="MaaAssistantArknights">
 // MeoAsstGui - A part of the MeoAssistantArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -8,25 +9,34 @@
 //
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY
+// </copyright>
 
-using System;
 using System.Threading.Tasks;
 using Stylet;
 using StyletIoC;
 
 namespace MeoAsstGui
 {
+    /// <summary>
+    /// The root view model.
+    /// </summary>
     public class RootViewModel : Conductor<Screen>.Collection.OneActive
     {
         private readonly IContainer _container;
         private readonly IWindowManager _windowManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RootViewModel"/> class.
+        /// </summary>
+        /// <param name="container">The IoC container.</param>
+        /// <param name="windowManager">The window manager.</param>
         public RootViewModel(IContainer container, IWindowManager windowManager)
         {
             _container = container;
             _windowManager = windowManager;
         }
 
+        /// <inheritdoc/>
         protected override void OnViewLoaded()
         {
             CheckAndUpdateNow();
@@ -50,13 +60,15 @@ namespace MeoAsstGui
         {
             var tvm = _container.Get<TaskQueueViewModel>();
             var rvm = _container.Get<RecruitViewModel>();
-            //var ivm = _container.Get<InfrastViewModel>();
+
+            // var ivm = _container.Get<InfrastViewModel>();
             var svm = _container.Get<SettingsViewModel>();
             var cvm = _container.Get<CopilotViewModel>();
 
             Items.Add(tvm);
             Items.Add(rvm);
-            //Items.Add(ivm);
+
+            // Items.Add(ivm);
             Items.Add(cvm);
             Items.Add(svm);
             svm.UpdateWindowTitle(); // 在标题栏上显示模拟器和IP端口 必须在 Items.Add(svm)之后执行。
@@ -90,15 +102,19 @@ namespace MeoAsstGui
 
         private string _windowTitle = "MaaAssistantArknights";
 
+        /// <summary>
+        /// Gets or sets the window title.
+        /// </summary>
         public string WindowTitle
         {
             get => _windowTitle;
             set => SetAndNotify(ref _windowTitle, value);
         }
 
+        /// <inheritdoc/>
         protected override void OnClose()
         {
-            App.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

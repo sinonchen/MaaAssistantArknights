@@ -54,7 +54,7 @@ bool asst::RoguelikeTask::set_params(const json::value& params)
     case 1:
         m_roguelike_task_ptr->set_times_limit("Roguelike1StageTraderLeave", 0);
         break;
-    case 2:
+    [[unlikely]] case 2:
         m_roguelike_task_ptr->set_times_limit("Roguelike1StageTraderInvestCancel", 0);
         break;
     default:
@@ -64,6 +64,12 @@ bool asst::RoguelikeTask::set_params(const json::value& params)
 
     int number_of_starts = params.get("starts_count", INT_MAX);
     m_roguelike_task_ptr->set_times_limit("Roguelike1Start", number_of_starts);
+
+    bool investment_enabled = params.get("investment_enabled", true);
+    if (!investment_enabled) {
+        // 禁用投资系统，通过 exceededNext 进入商店购买逻辑
+        m_roguelike_task_ptr->set_times_limit("Roguelike1StageTraderInvestSystem", 0);
+    }
 
     int number_of_investments = params.get("investments_count", INT_MAX);
     m_roguelike_task_ptr->set_times_limit("Roguelike1StageTraderInvestConfirm", number_of_investments);

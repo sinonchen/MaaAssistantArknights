@@ -22,10 +22,6 @@ namespace asst
         {
             return m_set_time_rect;
         }
-        Rect get_confirm_rect() const noexcept
-        {
-            return m_confirm_rect;
-        }
         Rect get_refresh_rect() const noexcept
         {
             return m_refresh_rect;
@@ -37,17 +33,12 @@ namespace asst
         {
             AbstractImageAnalyzer::set_roi(roi);
         }
-        virtual void set_image(const cv::Mat image, const Rect& roi)
-        {
-            AbstractImageAnalyzer::set_image(image, roi);
-        }
         bool tags_analyze();
         bool time_analyze();
         bool refresh_analyze();
 
         std::vector<TextRect> m_tags_result;
         std::vector<Rect> m_set_time_rect;
-        Rect m_confirm_rect;
         Rect m_refresh_rect;
     };
 }

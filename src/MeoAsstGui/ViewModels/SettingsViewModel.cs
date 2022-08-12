@@ -717,6 +717,10 @@ namespace MeoAsstGui
             {
                 SetAndNotify(ref _roguelikeMode, value);
                 ViewStatusStorage.Set("Roguelike.Mode", value);
+                if (value == "1")
+                {
+                    RoguelikeInvestmentEnabled = true;
+                }
             }
         }
 
@@ -793,6 +797,25 @@ namespace MeoAsstGui
             {
                 SetAndNotify(ref _roguelikeStartsCount, value.ToString());
                 ViewStatusStorage.Set("Roguelike.StartsCount", value.ToString());
+            }
+        }
+
+        private string _roguelikeInvestmentEnabled = ViewStatusStorage.Get("Roguelike.InvestmentEnabled", true.ToString());
+
+        /// <summary>
+        /// Gets or sets a value indicating whether investment is enabled.
+        /// </summary>
+        public bool RoguelikeInvestmentEnabled
+        {
+            get
+            {
+                return bool.Parse(_roguelikeInvestmentEnabled);
+            }
+
+            set
+            {
+                SetAndNotify(ref _roguelikeInvestmentEnabled, value.ToString());
+                ViewStatusStorage.Set("Roguelike.InvestmentEnabled", value.ToString());
             }
         }
 
@@ -1837,12 +1860,12 @@ namespace MeoAsstGui
 
                 var backup = _language;
                 ViewStatusStorage.Set("GUI.Localization", value);
-                System.Windows.Forms.MessageBoxManager.Yes = Localization.GetString("Ok");
-                System.Windows.Forms.MessageBoxManager.No = Localization.GetString("ManualRestart");
+                System.Windows.Forms.MessageBoxManager.Yes = Localization.GetString("Ok", value);
+                System.Windows.Forms.MessageBoxManager.No = Localization.GetString("ManualRestart", value);
                 System.Windows.Forms.MessageBoxManager.Register();
                 var result = MessageBox.Show(
-                    Localization.GetString("LanguageChangedTip"),
-                    Localization.GetString("Tip"),
+                    Localization.GetString("LanguageChangedTip", value),
+                    Localization.GetString("Tip", value),
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
                 System.Windows.Forms.MessageBoxManager.Unregister();

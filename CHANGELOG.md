@@ -1,7 +1,12 @@
-- Support I.S. custom start in YoStarEN and YoStarJP @MistEO @Npipyd
-- 新增支持剿灭 `全权委托` 关卡导航及掉落识别 @MistEO
-- 优化 界面 全屏显示及部分细节效果 @ABA2396
-- 修复 肉鸽 编队会漏掉某些干员的问题 @MistEO
-- 修复 公招 出 6 星时不显示组合的问题 @horror-proton
-- 尝试修复 基建 选择干员时的错误 @MistEO
-- C++ 20 升级工作 及 项目代码整理 @zzyyyl @horror-proton @lhhxxxxx @MistEO
+- 新增支持 `理想城：长夏狂欢季` 活动关卡导航 @ABA2396 @MistEO
+- 更新 `理想城：长夏狂欢季` 掉落识别、自动战斗地图数据 @MistEO @yuanyuan3060
+- 更新 公招 `傀影`, `巫恋`, `刻刀` 的数据 @zzyyyl
+- 新增支持 肉鸽 是否投资源石锭选项 @et2012
+- 修复 国际服肉鸽 boss 关卡不能识别的问题 @cookie223
+- 修复剿灭不勾选 `全权委托` 的问题 @MistEO
+- 修复关闭模拟器、开机自启动的一些问题 @cglcv
+- 修复 UI 启动时的工作目录设置 @BombaxCeiba
+- 修复编译问题、项目代码整理 @horror-proton @ChingCdesu @lhhxxxxx
+- 优化调整界面布局 @ABA2396
+- Github labeler 设置 @zzyyyl
+- Add English issue template @zzyyyl
